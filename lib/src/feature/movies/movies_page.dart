@@ -28,6 +28,7 @@ class _MoviesPageState extends State<MoviesPage>
           controller: _tabController,
           isScrollable: true,
           indicator: const DotIndicator(),
+          padding: const EdgeInsets.only(bottom: 15),
           tabs: const [
             Tab(text: 'Movie'),
             Tab(text: 'Series'),
@@ -39,8 +40,8 @@ class _MoviesPageState extends State<MoviesPage>
         controller: _tabController,
         children: const [
           MoviesView(),
-          SizedBox.expand(),
-          SizedBox.expand(),
+          Tab(text: 'Series'),
+          Tab(text: 'TV Shows')
         ],
       ),
     );

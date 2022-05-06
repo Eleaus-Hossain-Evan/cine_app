@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'core/constant/app_theme.dart';
 import 'feature/movies/movies_page.dart';
 
 class App extends StatelessWidget {
@@ -10,7 +11,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // title: appName,
-      // theme: AppTheme.light,
+      theme: AppTheme.light,
       home: const MoviesPage(),
     );
   }

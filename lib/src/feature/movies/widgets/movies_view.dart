@@ -1,3 +1,7 @@
+import 'dart:ui';
+
+import 'package:cine_app/src/core/constant/app_text_style.dart';
+import 'package:cine_app/src/feature/movie/movie_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/data/data.dart';
@@ -42,24 +46,78 @@ class _MoviesViewState extends State<MoviesView> {
               child: PageView.builder(
                 controller: _movieCardPageController,
                 clipBehavior: Clip.none,
+                onPageChanged: (page) {
+                  _movieDetailPageController.animateToPage(
+                    page,
+                    duration: const Duration(milliseconds: 550),
+                    curve: Curves.decelerate,
+                  );
+                },
                 itemCount: movies.length,
                 itemBuilder: (context, index) {
                   final movie = movies[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(movie.image),
-                          fit: BoxFit.cover,
+                  final progress = (_movieCardPage - index);
+                  final scale = lerpDouble(1, .5, progress.abs())!;
+                  final isScrolling = _movieCardPageController
+                      .position.isScrollingNotifier.value;
+                  final isCurrentPage = index == _movieCardIndex;
+                  final isFirstPage = index == 0;
+
+                  return Transform.scale(
+                      alignment: Alignment.lerp(
+                        Alignment.topLeft,
+                        Alignment.center,
+                        -progress,
+                      ),
+                      scale: isScrolling && isFirstPage ? 1 - progress : scale,
+                      child: GestureDetector(
+                        onTap: () {
+                          _showMovieDetail.value = !_showMovieDetail.value;
+
+                          const transitionDuration =
+                              Duration(milliseconds: 550);
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              transitionDuration: transitionDuration,
+                              reverseTransitionDuration: transitionDuration,
+                              pageBuilder: (_, animation, __) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: MoviePage(movie: movie),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: Hero(
+                          tag: movie.image,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            transform: Matrix4.identity()
+                              ..translate(
+                                isCurrentPage ? 0.0 : -80.0,
+                                isCurrentPage ? 0.0 : 60.0,
+                              ),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(70),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 25,
+                                  offset: const Offset(0, 25),
+                                  color: Colors.black.withOpacity(.2),
+                                ),
+                              ],
+                              image: DecorationImage(
+                                image: AssetImage(movie.image),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(70),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 25,
-                            offset: const Offset(0, 25),
-                          )
-                        ]),
-                  );
+                      ));
                 },
               ),
             ),
@@ -67,6 +125,48 @@ class _MoviesViewState extends State<MoviesView> {
             // *Movie Detail
             SizedBox(
               height: h * 0.25,
+              child: PageView.builder(
+                controller: _movieDetailPageController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: movies.length,
+                itemBuilder: (context, index) {
+                  final movie = movies[index];
+                  final opacity =
+                      (index - _movieDetailPage).clamp(0, 1).toDouble();
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: w * 0.1),
+                    child: Opacity(
+                      opacity: 1 - opacity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Hero(
+                            tag: movie.name,
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: Text(
+                                movie.name.toUpperCase(),
+                                style: AppTextStyles.movieNameTextStyle,
+                              ),
+                            ),
+                          ),
+                          ValueListenableBuilder<bool>(
+                            valueListenable: _showMovieDetail,
+                            builder: (context, showMovieDetail, child) {
+                              return Visibility(
+                                  child: child!, visible: showMovieDetail);
+                            },
+                            child: Text(
+                              movie.actors.join(", "),
+                              style: AppTextStyles.movieDetails,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         );
@@ -90,11 +190,15 @@ class _MoviesViewState extends State<MoviesView> {
   @override
   void dispose() {
     _movieCardPageController
-      ..removeListener(_movieCardPagePercentListener())
+      ..removeListener(() {
+        _movieCardPagePercentListener();
+      })
       ..dispose();
 
     _movieDetailPageController
-      ..removeListener(_movieDetailsPagePercentListener())
+      ..removeListener(() {
+        _movieDetailsPagePercentListener();
+      })
       ..dispose();
     super.dispose();
   }
