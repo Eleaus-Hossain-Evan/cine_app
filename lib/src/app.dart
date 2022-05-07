@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'core/constant/app_theme.dart';
+import 'core/constant/constant.dart';
 import 'feature/movies/movies_page.dart';
 
 class App extends StatelessWidget {
@@ -10,7 +10,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // title: appName,
+      title: appName,
       theme: AppTheme.light,
       home: const MoviesPage(),
     );

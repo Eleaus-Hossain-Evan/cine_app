@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:cine_app/src/core/constant/app_text_style.dart';
+import 'package:cine_app/src/core/constant/app_text_styles.dart';
 import 'package:cine_app/src/feature/movie/movie_page.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class _MoviesViewState extends State<MoviesView> {
   double _movieCardPage = 0;
   double _movieDetailPage = 0;
   int _movieCardIndex = 0;
-  final _showMovieDetail = ValueNotifier(false);
+  final _showMovieDetails = ValueNotifier(false);
 
   @override
   void initState() {
@@ -72,15 +72,14 @@ class _MoviesViewState extends State<MoviesView> {
                       scale: isScrolling && isFirstPage ? 1 - progress : scale,
                       child: GestureDetector(
                         onTap: () {
-                          _showMovieDetail.value = !_showMovieDetail.value;
-
+                          _showMovieDetails.value = !_showMovieDetails.value;
                           const transitionDuration =
                               Duration(milliseconds: 550);
                           Navigator.of(context).push(
                             PageRouteBuilder(
                               transitionDuration: transitionDuration,
                               reverseTransitionDuration: transitionDuration,
-                              pageBuilder: (_, animation, __) {
+                              pageBuilder: (_, animation, ___) {
                                 return FadeTransition(
                                   opacity: animation,
                                   child: MoviePage(movie: movie),
@@ -88,6 +87,9 @@ class _MoviesViewState extends State<MoviesView> {
                               },
                             ),
                           );
+                          Future.delayed(transitionDuration, () {
+                            _showMovieDetails.value = !_showMovieDetails.value;
+                          });
                         },
                         child: Hero(
                           tag: movie.image,
@@ -151,7 +153,7 @@ class _MoviesViewState extends State<MoviesView> {
                             ),
                           ),
                           ValueListenableBuilder<bool>(
-                            valueListenable: _showMovieDetail,
+                            valueListenable: _showMovieDetails,
                             builder: (context, showMovieDetail, child) {
                               return Visibility(
                                   child: child!, visible: showMovieDetail);

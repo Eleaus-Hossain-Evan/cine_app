@@ -1,7 +1,6 @@
-import 'package:cine_app/src/feature/movies/widgets/dot_tab_indicator.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/movies_view.dart';
+import 'widgets/widgets.dart';
 
 class MoviesPage extends StatefulWidget {
   const MoviesPage({Key? key}) : super(key: key);
