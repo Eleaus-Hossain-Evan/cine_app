@@ -25,16 +25,27 @@ class BookingPage extends StatelessWidget {
               Positioned(
                 width: w,
                 height: h * .885,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    children: [
+                      SizedBox(
                         height: h * .075,
                         child: MovieDates(dates: movie.dates),
                       ),
-                    )
-                  ],
+                      SizedBox(
+                        width: w,
+                        height: h * .2,
+                        child: MovieTheaterScreen(
+                          image: movie.image,
+                          maxWidth: w,
+                          maxHeight: h,
+                        ),
+                      ),
+                      MovieSeats(seats: movie.seats),
+                      const MovieSeatTypeLegend(),
+                    ],
+                  ),
                 ),
               ),
             ],
